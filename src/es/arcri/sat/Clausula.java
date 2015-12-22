@@ -19,7 +19,7 @@ public class Clausula {
 		}
 	}
 	
-	public List<ElementoClausula> distinct(ElementoClausula e){
+	public List<ElementoClausula> distincts(ElementoClausula e){
 		List<ElementoClausula> els=new LinkedList<ElementoClausula>();
 		for (ElementoClausula el : elementos) {
 			if(el.e!=e.e||el.negado!=e.negado){
@@ -42,5 +42,14 @@ public class Clausula {
 
 	public int size() {
 		return elementos.size();
+	}
+
+	public ElementoClausula distinct(ElementoClausula e) {
+		for (ElementoClausula el : elementos) {
+			if(el.e!=e.e||el.negado!=e.negado){
+				return el;
+			}
+		}
+		return null;	
 	}
 }

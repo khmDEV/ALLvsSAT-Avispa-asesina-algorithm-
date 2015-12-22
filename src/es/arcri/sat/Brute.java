@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Krom {
+public class Brute {
 	public static void main(String[] args) {
 		Elemento a = new Elemento(), b = new Elemento(), c = new Elemento(), d = new Elemento();
 		Clausula c1 = new Clausula();
@@ -14,6 +14,7 @@ public class Krom {
 		Clausula c2 = new Clausula();
 		c2.addElementoClausula(new ElementoClausula(a, true));
 		c2.addElementoClausula(new ElementoClausula(a, true));
+		c2.addElementoClausula(new ElementoClausula(b, false));
 
 		Clausula c3 = new Clausula();
 		c3.addElementoClausula(new ElementoClausula(a, false));
@@ -34,23 +35,23 @@ public class Krom {
 		list.add(c5);
 		System.out.println(list);
 
-		System.out.println(krom(new HashMap<Elemento, Boolean>(), list));
+		System.out.println(brute(new HashMap<Elemento, Boolean>(), list));
 	}
 
-	public static boolean krom(HashMap<Elemento, Boolean> forced,
+	public static boolean brute(HashMap<Elemento, Boolean> forced,
 			LinkedList<Clausula> l) {
 		ElementoClausula w = l.get(0).getElementos().get(0);
 
 		try {
-			return kromAux(forced, l, w)
-					|| kromAux(forced, l, new ElementoClausula(w.e, !w.negado));
+			return bruteAux(forced, l, w)
+					|| bruteAux(forced, l, new ElementoClausula(w.e, !w.negado));
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		return false;
 	}
 
-	public static boolean kromAux(HashMap<Elemento, Boolean> forced,
+	public static boolean bruteAux(HashMap<Elemento, Boolean> forced,
 			LinkedList<Clausula> l, ElementoClausula vct) throws Exception {
 
 		List<Clausula> recovery = new LinkedList<Clausula>();
@@ -58,8 +59,6 @@ public class Krom {
 		forced.put(vct.e, vct.negado);
 
 		Elemento v = vct.e;
-		
-		ElementoClausula nvct=new ElementoClausula(vct.e, !vct.negado);
 
 		List<Clausula> isTrue = v.getElementos(vct.negado), isFalse = v
 				.getElementos(!vct.negado);
@@ -82,37 +81,40 @@ public class Krom {
 					forced.remove(vct.e);
 					l.addAll(recovery);
 					return false;
-				case 2: // Clausula con 0 o >2 elementos ERROR
-					ElementoClausula w = clausula.distinct(nvct);
-					if (w == null) {
-						forced.remove(vct.e);
-						l.addAll(recovery);
-						return false;
+				default: // Clausula con 0 o >2 elementos ERROR
+					List<ElementoClausula> ws = clausula.distincts(vct);
+
+					boolean forc=false;
+					for (ElementoClausula w : ws) {
+						if (!forced.containsKey(w.e) // no existe una regla que
+														// impida
+														// que se cumpla
+								|| forced.get(w.e) == w.negado) { // la regla
+																	// permite
+																	// dar
+																	// una
+																	// salida
+																	// true a la
+																	// clausula
+							l.remove(clausula); // El elemento se elimina
+							recovery.add(clausula); // Lo guardamos en recovery
+
+							if (!bruteAux(forced, l, w)) {
+								l.add(clausula);
+							} else {
+								forc=true;
+								break;
+							}
+
+						}
 					}
-
-					if (!forced.containsKey(w.e) // no existe una regla que
-													// impida
-													// que se cumpla
-							|| forced.get(w.e) == w.negado) { // la regla
-																// permite
-																// dar
-																// una
-																// salida
-																// true a la
-																// clausula
-						forced.put(w.e, w.negado);
-						l.remove(clausula); // El elemento se elimina
-						recovery.add(clausula); // Lo guardamos en recovery
-
-					} else {
+					if(!forc){
 						forced.remove(vct.e);
 						l.addAll(recovery);
 						return false;
 					}
 
 					break;
-				default: // Clausula con 0 o >2 elementos ERROR
-					throw new Exception("Clausulas mal formadas");
 				}
 			}
 
@@ -121,7 +123,8 @@ public class Krom {
 		if (l.size() == 0) { // Fin del algoritmo
 			return true;
 		} else { // SAT reducido
-			return krom(forced, l);
+			return brute(forced, l);
 		}
 	}
+
 }
