@@ -68,7 +68,7 @@ public class SatHornSolver {
 				List<Clausula> isTrue = elementoAuxiliar.negado ? elementoAuxiliar.entrada.clausulasNegadas
 						: elementoAuxiliar.entrada.clausulasSinNegar;
 				for (Clausula cn : isFalse) {
-					List<Literal> ecs = new LinkedList<>();
+					List<Literal> ecs = new LinkedList<Literal>();
 					for (Literal ec : cn) {
 						if (ec.entrada == elementoAuxiliar.entrada
 								&& elementoAuxiliar.negado == ec.negado) {

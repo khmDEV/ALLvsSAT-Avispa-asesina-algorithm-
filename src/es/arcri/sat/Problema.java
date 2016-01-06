@@ -108,7 +108,7 @@ public class Problema extends LinkedList<Clausula> {
 		problem = problem.replace("\n", "");
 		problem = problem.replace("(", "");
 		problem = problem.replace(")", "");
-		HashMap<String, Entrada> elms = new HashMap<>();
+		HashMap<String, Entrada> elms = new HashMap<String, Entrada>();
 		for (String clausula : problem.split("\\*")) {
 			Clausula c = new Clausula();
 			for (String el : clausula.split("\\+")) {

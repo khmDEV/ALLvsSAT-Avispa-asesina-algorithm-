@@ -6,8 +6,8 @@ import java.util.List;
 import es.arcri.sat.exceptions.InvalidId;
 
 public class Entrada {
-	public List<Clausula> clausulasSinNegar = new LinkedList<>();
-	public List<Clausula> clausulasNegadas = new LinkedList<>();
+	public List<Clausula> clausulasSinNegar = new LinkedList<Clausula>();
+	public List<Clausula> clausulasNegadas = new LinkedList<Clausula>();
 	public final String id;
 
 	public Entrada() {
