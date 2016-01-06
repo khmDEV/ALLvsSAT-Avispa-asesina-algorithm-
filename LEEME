@@ -1,0 +1,28 @@
+Collados Torres,Aron  	626558@unizar.es	626558
+Román Morte,Cristian  	646564@unizar.es	646564
+
+///Introducción///
+Se ha diseñado un programa que resuelve problemas tipo SAT. El problema es capaz de detectar problemas SAT-2 y SAT-Horn y resolverlos de la forma más eficiente. En caso de que el problema no sea de ninguno de estos usará backtracking.
+
+Se ha implementado en Java, y es capaz de recibir problemas en fichero, o desde la entrada estándar a partir de una interfaz. 
+
+La implementación de Horn y Krom se ha realizado mediante las fuentes indicadas en la bibliografía, las cuales describen ambos algoritmos. El backtracking es una versión más compleja de Krom.
+
+///Reparto de tareas///
+Diseño inicial de la aplicación: ambos alumnos
+Horn solver: Aron Collados
+Krom solver: Cristian Román
+Backtracking: Cristian Román
+Tests: ambos alumnos
+
+///Pruebas///
+Para realizar las pruebas se ha implementado un generador de problemas SAT.  Además se ha encontrado una prueba positiva y negativa para cada una de los siguientes tipos de SAT: SAT-Horn, SAT-2 y SAT complejo.
+
+
+///Bibliografía///
+
+CSCI 404/504: Design and Analysis of Algorithms (Fall 2002) Instructor: Pranava K. Jha
+http://suraj.lums.edu.pk/~cs514s05/data/2SAT.pdf
+
+Solving Constrained Horn Clauses using Interpolation
+http://www.msr-waypoint.net/pubs/180055/MSR-TR-2013-6.pdf

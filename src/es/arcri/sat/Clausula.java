@@ -3,26 +3,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class Clausula {
-	private List<ElementoClausula> elementos=new LinkedList<ElementoClausula>();
-	
-	public List<ElementoClausula> getElementos(){
-		return elementos;
-	}
-	
-	public void addElementoClausula(ElementoClausula e){
-		elementos.add(e);
+@SuppressWarnings("serial")
+public class Clausula extends LinkedList<Literal>{
+
+	public boolean add(Literal e){
 		if (e.negado) {
-			e.e.addClausulaFalse(this);
+			e.entrada.addClausulaFalse(this);
 		}else{
-			e.e.addClausulaTrue(this);
+			e.entrada.addClausulaTrue(this);
 		}
+		return super.add(e);
 	}
 	
-	public List<ElementoClausula> distincts(ElementoClausula e){
-		List<ElementoClausula> els=new LinkedList<ElementoClausula>();
-		for (ElementoClausula el : elementos) {
-			if(el.e!=e.e||el.negado!=e.negado){
+	public List<Literal> distincts(Literal e){
+		List<Literal> els=new LinkedList<Literal>();
+		for (Literal el : this) {
+			if(el.entrada!=e.entrada||el.negado!=e.negado){
 				els.add(el);
 			}
 		}
@@ -31,25 +27,50 @@ public class Clausula {
 	@Override
 	public String toString(){
 		String s="(";
-		for (int i = 0; i < elementos.size(); i++) {
-			s+=elementos.get(i);
-			if (elementos.size()>(i+1)) {
+		for (int i = 0; i < size(); i++) {
+			s+=get(i);
+			if (size()>(i+1)) {
 				s+=" + ";
 			}
 		}
 		return s+")";
 	}
 
-	public int size() {
-		return elementos.size();
-	}
-
-	public ElementoClausula distinct(ElementoClausula e) {
-		for (ElementoClausula el : elementos) {
-			if(el.e!=e.e||el.negado!=e.negado){
+	public Literal distinct(Entrada e, boolean entrada) {
+		for (Literal el : this) {
+			if(el.entrada!=e||el.negado!=entrada){
 				return el;
 			}
 		}
 		return null;	
+	}
+
+	public Literal distinct(Literal e) {
+		for (Literal el : this) {
+			if(el.entrada!=e.entrada||el.negado!=e.negado){
+				return el;
+			}
+		}
+		return null;	
+	}
+
+	public List<Entrada> positive() {
+		List<Entrada> elems=new LinkedList<Entrada>();
+		for (Literal ec : this) {
+			if (!ec.negado) {
+				elems.add(ec.entrada);
+			}
+		}
+		return elems;
+	}
+
+	public List<Literal> distincts(Entrada v, boolean entrada) {
+		List<Literal> els=new LinkedList<Literal>();
+		for (Literal el : this) {
+			if(el.entrada!=v||el.negado!=entrada){
+				els.add(el);
+			}
+		}
+		return els;
 	}
 }

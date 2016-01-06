@@ -1,83 +1,107 @@
 package es.arcri.sat;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import es.arcri.sat.exceptions.IsNotHorn;
+
 public class SatHornSolver {
-	
+
 	public static void main(String[] args) {
-		Elemento a = new Elemento(), b = new Elemento(), c = new Elemento(), d = new Elemento();
+		Entrada a = new Entrada(), b = new Entrada(), c = new Entrada();
 		Clausula c1 = new Clausula();
-		c1.addElementoClausula(new ElementoClausula(a, false));
-		c1.addElementoClausula(new ElementoClausula(a, false));
+		c1.add(new Literal(a, false));
+		c1.add(new Literal(a, true));
 
 		Clausula c2 = new Clausula();
-		c2.addElementoClausula(new ElementoClausula(a, true));
-		c2.addElementoClausula(new ElementoClausula(a, true));
+		c2.add(new Literal(a, true));
+		c2.add(new Literal(a, false));
 
 		Clausula c3 = new Clausula();
-		c3.addElementoClausula(new ElementoClausula(a, false));
+		c3.add(new Literal(a, false));
 
 		Clausula c4 = new Clausula();
-		c4.addElementoClausula(new ElementoClausula(c, true));
-		c4.addElementoClausula(new ElementoClausula(d, true));
+		c4.add(new Literal(b, true));
+		c4.add(new Literal(c, false));
 
 		Clausula c5 = new Clausula();
-		c5.addElementoClausula(new ElementoClausula(a, true));
-		c5.addElementoClausula(new ElementoClausula(b, false));
+		c5.add(new Literal(a, true));
+		c5.add(new Literal(b, false));
 
-		LinkedList<Clausula> list = new LinkedList<Clausula>();
-		list.add(c1);
-		list.add(c2);
-		list.add(c3);
-		list.add(c4);
-		list.add(c5);
-		System.out.println(list);
+		Problema problema = new Problema();
+		problema.add(c1);
+		problema.add(c2);
+		problema.add(c3);
+		problema.add(c4);
+		problema.add(c5);
+		System.out.println(problema);
 
-		System.out.println(UnitPropagation(list));
+		try {
+			System.out.println(UnitPropagation(problema));
+		} catch (IsNotHorn e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
-	
-	//Lo suponemos bien formado para la primera iteracion
-	public static boolean UnitPropagation(List<Clausula> problema) {
+
+	// Lo suponemos bien formado para la primera iteracion
+	public static boolean UnitPropagation(List<Clausula> problema)
+			throws IsNotHorn {
 		boolean unitClause = false;
-		
-		if (problema.size()  == 0){
+		while (problema.size()!=0 && problema.get(0).size()==0) {
+			problema.remove(0);
+		}
+		if (problema.size()==0) {
 			return true;
 		}
-	
-	//If G contains a unit clause (L), delete every occurrence of L from clauses
-	//of G, and delete every clause containing L from G.
-		int i = 0;
-		while(i < problema.size() && !unitClause){
+
+		// If G contains a unit clause (L), delete every occurrence of L from
+		// clauses
+		// of G, and delete every clause containing L from G.
+		for (int i = 0; i < problema.size() && !unitClause; i++) {
 			Clausula clausulaAuxiliar = problema.get(i);
-			if(clausulaAuxiliar.size()==1){
-				if(!clausulaAuxiliar.getElementos().get(0).negado){
-					unitClause = true;
-					Elemento elementoAuxiliar = clausulaAuxiliar.getElementos().get(0).e; //Elemento unit Clause
-					
-					for(int z=0; z < elementoAuxiliar.clausulasFalse.size();z++){ //delete every occurrence of L from clauses of G,			
-						elementoAuxiliar.clausulasFalse.get(z).getElementos().remove(elementoAuxiliar);
-						if(elementoAuxiliar.clausulasFalse.get(z).size()==0){
-							problema.remove(elementoAuxiliar.clausulasTrue.get(z));
+			if (clausulaAuxiliar.size() == 1) {
+				unitClause = true;
+				Literal elementoAuxiliar = clausulaAuxiliar.get(0); // Elemento unit Clause
+				List<Clausula> isFalse = !elementoAuxiliar.negado ? elementoAuxiliar.entrada.clausulasNegadas
+						: elementoAuxiliar.entrada.clausulasSinNegar;
+				List<Clausula> isTrue = elementoAuxiliar.negado ? elementoAuxiliar.entrada.clausulasNegadas
+						: elementoAuxiliar.entrada.clausulasSinNegar;
+				for (Clausula cn : isFalse) {
+					List<Literal> ecs = new LinkedList<>();
+					for (Literal ec : cn) {
+						if (ec.entrada == elementoAuxiliar.entrada
+								&& elementoAuxiliar.negado == ec.negado) {
+							ecs.add(ec);
 						}
 					}
-					for(int z=0; z < elementoAuxiliar.clausulasTrue.size();z++){ //delete every clause containing L from G.
-						problema.remove(elementoAuxiliar.clausulasTrue.get(z));
+					// La clausula solo contiene uno o varias entradas de
+					// elementoAuxiliar que no pueden tener una salida positiva
+					if (ecs.size() == cn.size()) {
+						if(cn.size()==0){
+							problema.remove(cn);
+						}
+						return false;
 					}
+					for (Literal tr : ecs) {
+						cn.remove(tr);
+					}
+					if(cn.size()==0){
+						problema.remove(cn);
+					}
+				}
+				for (int z = 0; z < isTrue.size(); z++) { // delete every clause
+															// containing L from
+															// G.
+					problema.remove(isTrue.get(z));
 				}
 			}
 		}
-		if (!unitClause){
-			return false;
-		}else{
+		if (!unitClause) {
+			throw new IsNotHorn(problema);
+		} else {
 			return UnitPropagation(problema);
 		}
-		
-		
-		
-		
-	
+
 	}
 }
